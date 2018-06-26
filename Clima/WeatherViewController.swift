@@ -18,6 +18,17 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     let WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
     let APP_ID = "eb3e170c137ed1f6f430a000ec8a5461"
     
+    @IBOutlet weak var faren: UISwitch!
+    
+    @IBAction func `switch`(_ sender: UISwitch) {
+        if sender.isOn {
+            
+        }
+        
+    }
+    
+    
+    
 
     //TODO: Declare instance variables here
     let locationManager = CLLocationManager()
@@ -85,7 +96,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     
     //Write the updateWeatherData method here:
     func updateWeatherData(json : JSON){
-        // find json which has entire weather data, get key main and all values and inside there get key called temp and pull value 
+        // find json which has entire weather data, get key main and all values and inside there get key called temp and pull value
         if let tempResult = json["main"]["temp"].double {
             
         
