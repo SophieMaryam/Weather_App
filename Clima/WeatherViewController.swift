@@ -12,7 +12,7 @@ import Alamofire
 import SwiftyJSON
 
 
-class WeatherViewController: UIViewController, CLLocationManagerDelegate {
+class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
     
     //Constants
     let WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
@@ -60,13 +60,15 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
             response in
             if response.result.isSuccess {
                 print("Success! Get the weather data")
-                
                 let weatherJSON : JSON = JSON(response.result.value!)
+                
+                
                 self.updateWeatherData(json: weatherJSON)
+                
                 print(weatherJSON)
                 
             } else {
-                print("Error \(response.result.error)")
+                print("Error \(String(describing: response.result.error))")
                 self.cityLabel.text = "Connection Issues"
             }
         }
@@ -82,7 +84,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
    
     
     //Write the updateWeatherData method here:
-    func updateWeatherData(json: JSON){
+    func updateWeatherData(json : JSON){
         // find json which has entire weather data, get key main and all values and inside there get key called temp and pull value 
         if let tempResult = json["main"]["temp"].double {
             
@@ -116,7 +118,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     func updateUIWithWeatherData() {
         cityLabel.text = weatherDataModel.city
-        temperatureLabel.text = "\(weatherDataModel.temperature)"
+        temperatureLabel.text = "\(weatherDataModel.temperature)°"
         weatherIcon.image = UIImage(named: weatherDataModel.weatherIconName)
     }
     
@@ -130,15 +132,15 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[locations.count - 1]
         if location.horizontalAccuracy > 0 {
-            locationManager.stopUpdatingLocation()
-            locationManager.delegate = nil
+            
+            self.locationManager.stopUpdatingLocation()
+//            locationManager.delegate = nil
             
             print("longitude = \(location.coordinate.longitude), latitude = \(location.coordinate.latitude)")
             let latitude = String(location.coordinate.latitude)
             let longitude = String(location.coordinate.longitude)
             
             let params : [String : String] = ["lat" : latitude, "lon" : longitude, "appID" : APP_ID]
-            
             
             getWeatherData(url: WEATHER_URL, parameters: params)
             
@@ -161,12 +163,28 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     
     //Write the userEnteredANewCityName Delegate method here:
+    func userEnteredNewCityName(city: String) {
+        
+        let params : [String : String] = ["q" : city, "appid" : APP_ID]
+        
+        getWeatherData(url: WEATHER_URL, parameters: params)
+        
+    }
     
 
     
     //Write the PrepareForSegue Method here
     
-    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?){
+        
+        if segue.identifier == "changeCityName" {
+            
+            let destinationVC = segue.destination as! ChangeCityViewController
+            
+            destinationVC.delegate = self
+        }
+        
+    }
     
     
     
